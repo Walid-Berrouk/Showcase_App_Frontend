@@ -1,8 +1,14 @@
 import React, { useState } from 'react'
 
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios'
+
+// Assets
+import { baseUrl } from '../shared/baseUrl'
 
 export default function SignInPage() {
+
+  const navigate = useNavigate()
 
 
     const [credentials, setCredentials] = useState({
@@ -12,8 +18,21 @@ export default function SignInPage() {
 
     const handleSubmit = event => {
         event.preventDefault()
-        console.log(credentials)
-        alert(`Email:${credentials.email}  \nPassword:${credentials.password} \nThank for using our web site`)
+        // console.log(credentials)
+        // alert(`Email:${credentials.email}  \nPassword:${credentials.password} \nThank for using our web site`)
+
+        axios
+        .post(`${baseUrl}/api/signIn`,
+            credentials
+        )
+        .then(res => {
+            alert(res.data)
+            localStorage.setItem('JWT', res.data.token)
+            navigate("/main/home")
+        })
+        .catch(err => {
+            alert("Something Went Wrong ! Please Try Again")
+        })
     }
 
 

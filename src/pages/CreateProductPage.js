@@ -1,19 +1,43 @@
 import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios'
+
+// Assets
+import { baseUrl } from '../shared/baseUrl'
 
 export default function CreateProductPage() {
 
+  const navigate = useNavigate()
 
   const [product, setProduct] = useState({
     name: "",
     description: "",
-    link: "",
-    image: "",
-})
+  })
+
+  const [image, setImage] = useState(null)
 
 const handleSubmit = event => {
     event.preventDefault()
-    console.log(product)
-    alert(`Name: ${product.name}  \nDescription: ${product.description} \nLink: ${product.description} \nImage: ${product.image} \nThank for using our web site`)
+    // console.log(product)
+    // alert(`Name: ${product.name}  \nDescription: ${product.description} \n \nImage: ${product.image} \nThank for using our web site`)
+
+    const ProductFormData = new FormData()
+    ProductFormData.append("image", image);
+    ProductFormData.append("product", JSON.stringify(product));
+
+    axios({
+        method: "post",
+        url: `${baseUrl}/product`,
+        data:  ProductFormData,
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+      .then(res => {
+          alert(res.data)
+          navigate("/main/products")
+      })
+      .catch(err => {
+          alert("Something Went Wrong ! Please Try Again")
+      })
 }
 
 
@@ -30,8 +54,9 @@ const handleSubmit = event => {
             <div className="row g-3">
               <div className="col-12">
                 <label htmlFor="productName" className="form-label">Product name</label>
-                <input type="text" className="form-control" id="productName" placeholder="Case 4378" required=""
+                <input type="text" className="form-control" id="productName" placeholder="Case 4378"
                   value={product.name}
+                  required
                   onChange={(event) => setProduct({...product, name: event.target.value})}
                 />
                 <div className="invalid-feedback">
@@ -41,8 +66,9 @@ const handleSubmit = event => {
 
               <div className="col-12">
                 <label htmlFor="productDesc" className="form-label">Product Description</label>
-                <textarea className="form-control" id="productDesc" placeholder="Case Black Black Water Proof" required=""
+                <textarea className="form-control" id="productDesc" placeholder="Case Black Black Water Proof"
                   value={product.description}
+                  required
                   onChange={(event) => setProduct({...product, description: event.target.value})}
                 />
                 <div className="invalid-feedback">
@@ -51,21 +77,9 @@ const handleSubmit = event => {
               </div>
 
               <div className="col-12">
-                <label htmlFor="link" className="form-label">Product Link</label>
-                <input type="text" className="form-control" id="link" placeholder="http://productlink.com" required=""
-                  value={product.link}
-                  onChange={(event) => setProduct({...product, link: event.target.value})}
-                />
-                <div className="invalid-feedback">
-                  Please enter the product Link.
-                </div>
-              </div>
-
-              <div className="col-12">
                 <label htmlFor="productImage" className="form-label">Product Image <span className="text-muted">(Optional)</span></label>
-                <input type="file" className="form-control" id="productImage"
-                  value={product.image}
-                  onChange={(event) => setProduct({...product, image: event.target.value})}
+                <input type="file" accept="image/*" required className="form-control" id="productImage"
+                  onChange={(event) => setImage(event.target.files[0])}
                 />
               </div>
 
